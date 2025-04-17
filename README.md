@@ -49,31 +49,36 @@ cd gerenciador-biblioteca
 # Execute o sistema
 python main.py
 ```
-🔮 Futuras melhorias
-Integração com APIs de livros
 
-Interface responsiva para web
+## 🔮 Futuras melhorias
 
-Login com autenticação por e-mail
+- Integração com APIs de livros
 
-Estatísticas visuais de leitura (gráficos, dashboards)
+- Interface responsiva para web
 
-🤝 Contribuição
-Faça um fork do projeto
+- Login com autenticação por e-mail
 
-Crie uma branch: git checkout -b minha-feature
+- Estatísticas visuais de leitura (gráficos, dashboards)
 
-Commit suas mudanças: git commit -m 'feat: minha nova funcionalidade'
+## 🤝 Contribuição
 
-Push: git push origin minha-feature
+- Faça um fork do projeto
 
-Abra um Pull Request
+- Crie uma branch: git checkout -b minha-feature
 
-👨‍💻 Autores
-João Vitor Costa Rolim
+- Commit suas mudanças: git commit -m 'feat: minha nova funcionalidade'
 
-José Iatagan Andrade Neto
+- Push: git push origin minha-feature
 
-📄 Licença
-Este projeto está licenciado sob a Licença MIT.
-Sinta-se livre para usá-lo, estudá-lo e adaptá-lo!
+- Abra um Pull Request
+
+## 👨‍💻 Autores
+
+- João Vitor Costa Rolim
+
+- José Iatagan Andrade Neto
+
+## 📄 Licença
+
+- Este projeto está licenciado sob a Licença MIT.
+- Sinta-se livre para usá-lo, estudá-lo e adaptá-lo!
