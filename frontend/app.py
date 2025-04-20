@@ -68,6 +68,11 @@ def mostrar_tela_cadastro():
     campo_confirmar_senha = ctk.CTkEntry(frame, placeholder_text="Confirmar senha", show="*")
     campo_confirmar_senha.pack(padx=20, pady=5, fill="x")
 
+    # Botão de voltar
+    botao_voltar = ctk.CTkButton(frame, text="🔙 Voltar para o Login", fg_color='transparent', hover_color='#444', text_color='lightblue', command=mostrar_tela_login)
+    botao_voltar.pack(pady=(0, 10))
+
+
     def cadastrar_usuario():
         nome = campo_nome.get()
         email = campo_email.get()
@@ -99,6 +104,11 @@ def mostrar_tela_recuperar_senha():
     campo_email = ctk.CTkEntry(frame, placeholder_text="Digite seu e-mail")
     campo_email.pack(padx=20, pady=10, fill="x")
 
+    # Botão de voltar
+    botao_voltar = ctk.CTkButton(frame, text="🔙 Voltar para o Login", fg_color='transparent', hover_color='#444', text_color='lightblue', command=mostrar_tela_login)
+    botao_voltar.pack(pady=(0, 10))
+
+
     def recuperar_senha():
         email = campo_email.get()
         if email:
@@ -125,7 +135,7 @@ def validar_login(campo_usuario, campo_senha, resultado_login):
 app = ctk.CTk()
 app.title('📚 Biblioteca - Acesso')
 app.geometry('500x500')
-app.resizable(False, False)
+app.resizable(True, True)
 
 # Frame centralizado
 frame = ctk.CTkFrame(master=app, corner_radius=15)
