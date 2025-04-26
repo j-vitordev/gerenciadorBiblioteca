@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
+from backend.cadusuario import validar_usuario, cadastrar_usuario
 
 # Configuração do tema
 ctk.set_appearance_mode('dark')
@@ -113,10 +114,10 @@ def mostrar_tela_recuperar_senha():
     resultado.pack(pady=5)
 
 def validar_login(campo_usuario, campo_senha, resultado_login):
-    usuario = campo_usuario.get()
+    email = campo_usuario.get()
     senha = campo_senha.get()
 
-    if usuario == 'admin' and senha == 'admin':
+    if validar_usuario(email, senha):
         resultado_login.configure(text='Login feito com sucesso ✅', text_color='green')
     else:
         resultado_login.configure(text='Usuário ou senha incorretos ❌', text_color='red')
