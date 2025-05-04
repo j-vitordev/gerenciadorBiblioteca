@@ -1,20 +1,47 @@
 import customtkinter as ctk
 from PIL import Image
-from backend.cadusuario import validar_usuario, cadastrar_usuario
+import sys
+import os
+from dotenv import load_dotenv
 
-# Configuração do tema
+load_dotenv('credenciais.env')
+
+
+# Configuração de caminhos
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'backend')))
+
+# Importações
+from backend.cadusuario import validar_usuario, cadastrar_usuario as cadastrar_no_banco
+
+# Tema
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('blue')
 
-def mostrar_tela_login():
-    # Limpar tela
+# Janela principal
+app = ctk.CTk()
+app.title('📚 Biblioteca - Acesso')
+app.geometry('500x500')
+app.resizable(True, True)
+
+frame = ctk.CTkFrame(master=app, corner_radius=15)
+frame.pack(pady=40, padx=40, fill='both', expand=True)
+
+# Funções
+def mostrar_tela_login(janela=None):
+    janela = janela or app
+    
     for widget in frame.winfo_children():
         widget.destroy()
 
-    # Tela de Login
-    imagem = ctk.CTkImage(Image.open("imagens/logoUnichristus.png"), size=(80, 80))
-    logo = ctk.CTkLabel(master=frame, image=imagem, text="")
-    logo.pack(pady=(10, 5))
+    try:
+        imagem = ctk.CTkImage(Image.open(os.getenv("LOGO_UNI")), size=(80, 80))
+        logo = ctk.CTkLabel(master=frame, image=imagem, text="")
+        logo.pack(pady=(10, 5))
+    except Exception as e:
+        print(f"Erro ao carregar imagem: {e}")
+        logo = ctk.CTkLabel(master=frame, text="📚", font=("Arial", 30))
+        logo.pack(pady=(10, 5))
 
     titulo = ctk.CTkLabel(master=frame, text='🔒 Acesso à Biblioteca', font=('Arial', 22, 'bold'))
     titulo.pack(pady=(5, 10))
@@ -31,31 +58,27 @@ def mostrar_tela_login():
     campo_senha = ctk.CTkEntry(master=frame, placeholder_text="Digite sua senha", show='*')
     campo_senha.pack(padx=20, pady=5, fill='x')
 
-    # Botão de login
-    botao_login = ctk.CTkButton(master=frame, text='Entrar na Biblioteca', command=lambda: validar_login(campo_usuario, campo_senha, resultado_login))
+    botao_login = ctk.CTkButton(master=frame, text='Entrar na Biblioteca',
+                               command=lambda: validar_login(campo_usuario, campo_senha))
     botao_login.pack(pady=(10, 5))
 
-    # Esqueceu a senha
-    botao_esqueceu = ctk.CTkButton(master=frame, text='Esqueceu a senha?', fg_color='transparent', hover_color='#444', text_color='lightblue', command=mostrar_tela_recuperar_senha)
-    botao_esqueceu.pack(pady=(0, 10))
+    ctk.CTkButton(master=frame, text='Esqueceu a senha?', fg_color='transparent',
+                 hover_color='#444', text_color='lightblue', command=mostrar_tela_recuperar_senha).pack(pady=(0, 10))
 
-    # Criar conta
-    botao_cadastrar = ctk.CTkButton(master=frame, text="Criar conta", fg_color='transparent', hover_color='#444', text_color='lightblue', command=mostrar_tela_cadastro)
-    botao_cadastrar.pack(pady=(0, 10))
+    ctk.CTkButton(master=frame, text="Criar conta", fg_color='transparent',
+                 hover_color='#444', text_color='lightblue', command=mostrar_tela_cadastro).pack(pady=(0, 10))
 
-    # Resultado
     global resultado_login
     resultado_login = ctk.CTkLabel(master=frame, text='', font=('Arial', 12, 'italic'))
     resultado_login.pack(pady=5)
 
 def mostrar_tela_cadastro():
-    # Limpar tela
     for widget in frame.winfo_children():
         widget.destroy()
 
-    # Tela de Cadastro
-    titulo = ctk.CTkLabel(frame, text="📝 Cadastro de Usuário", font=('Arial', 22, 'bold'))
-    titulo.pack(pady=(20, 10))
+    ctk.CTkLabel(frame, text="📝 Cadastro de Usuário", font=('Arial', 22, 'bold')).pack(pady=(20, 10))
+
+    global campo_nome, campo_email, campo_senha, campo_confirmar_senha
 
     campo_nome = ctk.CTkEntry(frame, placeholder_text="Nome completo")
     campo_nome.pack(padx=20, pady=5, fill="x")
@@ -69,46 +92,23 @@ def mostrar_tela_cadastro():
     campo_confirmar_senha = ctk.CTkEntry(frame, placeholder_text="Confirmar senha", show="*")
     campo_confirmar_senha.pack(padx=20, pady=5, fill="x")
 
-    # Botão de voltar
-    botao_voltar = ctk.CTkButton(frame, text="🔙 Voltar para o Login", fg_color='transparent', hover_color='#444', text_color='lightblue', command=mostrar_tela_login)
-    botao_voltar.pack(pady=(0, 10))
+    ctk.CTkButton(frame, text="Cadastrar", command=cadastrar_usuario).pack(pady=15)
 
+    ctk.CTkButton(frame, text="🔙 Voltar para o Login", fg_color='transparent',
+                 hover_color='#444', text_color='lightblue', command=mostrar_tela_login).pack(pady=(0, 10))
 
-    def cadastrar_usuario():
-        nome = campo_nome.get()
-        email = campo_email.get()
-        senha = campo_senha.get()
-        confirmar = campo_confirmar_senha.get()
-
-        if senha != confirmar:
-            resultado.configure(text="❌ As senhas não coincidem!", text_color="red")
-        elif nome and email and senha:
-            resultado.configure(text="✅ Cadastro realizado com sucesso!", text_color="green")
-        else:
-            resultado.configure(text="⚠️ Preencha todos os campos.", text_color="yellow")
-
-    botao_cadastrar = ctk.CTkButton(frame, text="Cadastrar", command=cadastrar_usuario)
-    botao_cadastrar.pack(pady=15)
-
+    global resultado
     resultado = ctk.CTkLabel(frame, text="", font=("Arial", 12, "italic"))
     resultado.pack(pady=5)
 
 def mostrar_tela_recuperar_senha():
-    # Limpar tela
     for widget in frame.winfo_children():
         widget.destroy()
 
-    # Tela de Recuperação de Senha
-    titulo = ctk.CTkLabel(frame, text="🔐 Recuperar Senha", font=('Arial', 22, 'bold'))
-    titulo.pack(pady=(20, 10))
+    ctk.CTkLabel(frame, text="🔐 Recuperar Senha", font=('Arial', 22, 'bold')).pack(pady=(20, 10))
 
     campo_email = ctk.CTkEntry(frame, placeholder_text="Digite seu e-mail")
     campo_email.pack(padx=20, pady=10, fill="x")
-
-    # Botão de voltar
-    botao_voltar = ctk.CTkButton(frame, text="🔙 Voltar para o Login", fg_color='transparent', hover_color='#444', text_color='lightblue', command=mostrar_tela_login)
-    botao_voltar.pack(pady=(0, 10))
-
 
     def recuperar_senha():
         email = campo_email.get()
@@ -117,32 +117,50 @@ def mostrar_tela_recuperar_senha():
         else:
             resultado.configure(text="❗ Digite seu e-mail!", text_color="red")
 
-    botao_enviar = ctk.CTkButton(frame, text="Enviar Instruções", command=recuperar_senha)
-    botao_enviar.pack(pady=10)
+    ctk.CTkButton(frame, text="Enviar Instruções", command=recuperar_senha).pack(pady=10)
+    ctk.CTkButton(frame, text="🔙 Voltar para o Login", fg_color='transparent',
+                 hover_color='#444', text_color='lightblue', command=mostrar_tela_login).pack(pady=(0, 10))
 
+    global resultado
     resultado = ctk.CTkLabel(frame, text="", font=("Arial", 12, "italic"))
     resultado.pack(pady=5)
 
-def validar_login(campo_usuario, campo_senha, resultado_login):
+def validar_login(campo_usuario, campo_senha):
     email = campo_usuario.get()
     senha = campo_senha.get()
 
     if validar_usuario(email, senha):
         resultado_login.configure(text='Login feito com sucesso ✅', text_color='green')
+        frame.after(500, abrir_tela_home)
     else:
         resultado_login.configure(text='Usuário ou senha incorretos ❌', text_color='red')
 
-# Janela principal
-app = ctk.CTk()
-app.title('📚 Biblioteca - Acesso')
-app.geometry('500x500')
-app.resizable(True, True)
+def abrir_tela_home():
+    for widget in app.winfo_children():
+        widget.destroy()
+    from tela_home import mostrar_tela_home
+    mostrar_tela_home(app)
 
-# Frame centralizado
-frame = ctk.CTkFrame(master=app, corner_radius=15)
-frame.pack(pady=40, padx=40, fill='both', expand=True)
+def cadastrar_usuario():
+    nome = campo_nome.get()
+    email = campo_email.get()
+    senha = campo_senha.get()
+    confirmar = campo_confirmar_senha.get()
 
-# Chama a tela de login ao iniciar
+    if senha != confirmar:
+        resultado.configure(text="❌ As senhas não coincidem!", text_color="red")
+    elif nome and email and senha:
+        sucesso = cadastrar_no_banco(nome, email, senha)
+        if sucesso:
+            resultado.configure(text="✅ Cadastro realizado com sucesso!", text_color="green")
+            campo_nome.delete(0, "end")
+            campo_email.delete(0, "end")
+            campo_senha.delete(0, "end")
+            campo_confirmar_senha.delete(0, "end")
+        else:
+            resultado.configure(text="❌ Erro ao cadastrar no banco!", text_color="red")
+    else:
+        resultado.configure(text="⚠️ Preencha todos os campos.", text_color="yellow")
+
 mostrar_tela_login()
-
 app.mainloop()

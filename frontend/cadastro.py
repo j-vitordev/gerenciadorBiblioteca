@@ -1,4 +1,10 @@
 import customtkinter as ctk
+import sys
+import os
+
+# Garante que o backend seja importado corretamente
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
+from backend.cadusuario import cadastrar_usuario as cadastrar_backend
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
@@ -12,7 +18,11 @@ def cadastrar_usuario():
     if senha != confirmar:
         resultado.configure(text="❌ As senhas não coincidem!", text_color="red")
     elif nome and email and senha:
-        resultado.configure(text="✅ Cadastro realizado com sucesso!", text_color="green")
+        sucesso = cadastrar_backend(nome, email, senha)
+        if sucesso:
+            resultado.configure(text="✅ Cadastro realizado com sucesso!", text_color="green")
+        else:
+            resultado.configure(text="❌ Erro ao cadastrar no banco.", text_color="red")
     else:
         resultado.configure(text="⚠️ Preencha todos os campos.", text_color="yellow")
 
