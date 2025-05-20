@@ -1,3 +1,5 @@
+# frontend/cadastro_usuario.py
+
 import customtkinter as ctk
 import sys
 import os
@@ -21,10 +23,17 @@ def cadastrar_usuario():
         sucesso = cadastrar_backend(nome, email, senha)
         if sucesso:
             resultado.configure(text="✅ Cadastro realizado com sucesso!", text_color="green")
+            limpar_campos()
         else:
-            resultado.configure(text="❌ Erro ao cadastrar no banco.", text_color="red")
+            resultado.configure(text="❌ Erro ao cadastrar. Verifique se o e-mail já foi usado.", text_color="red")
     else:
         resultado.configure(text="⚠️ Preencha todos os campos.", text_color="yellow")
+
+def limpar_campos():
+    campo_nome.delete(0, "end")
+    campo_email.delete(0, "end")
+    campo_senha.delete(0, "end")
+    campo_confirmar_senha.delete(0, "end")
 
 app = ctk.CTk()
 app.title("📚 Biblioteca - Cadastro")
