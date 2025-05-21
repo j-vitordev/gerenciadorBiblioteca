@@ -1,4 +1,3 @@
-# backend/conexao.py
 
 import pyodbc
 import os
