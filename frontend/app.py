@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 load_dotenv('credenciais.env')
 
-
 # Configuração de caminhos
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'backend')))
@@ -129,9 +128,14 @@ def validar_login(campo_usuario, campo_senha):
     email = campo_usuario.get()
     senha = campo_senha.get()
 
-    if validar_usuario(email, senha):
+    resultado_validacao = validar_usuario(email, senha)
+
+    if resultado_validacao["sucesso"]:
         resultado_login.configure(text='Login feito com sucesso ✅', text_color='green')
-        frame.after(500, abrir_tela_home)
+        if resultado_validacao["admin"]:
+            frame.after(500, abrir_tela_home_admin)
+        else:
+            frame.after(500, abrir_tela_home)
     else:
         resultado_login.configure(text='Usuário ou senha incorretos ❌', text_color='red')
 
@@ -140,6 +144,12 @@ def abrir_tela_home():
         widget.destroy()
     from tela_home import mostrar_tela_home
     mostrar_tela_home(app)
+
+def abrir_tela_home_admin():
+    for widget in app.winfo_children():
+        widget.destroy()
+    from tela_home_adm import TelaHomeAdmin
+    TelaHomeAdmin(app)  # Passa a janela principal como parâmetro
 
 def cadastrar_usuario():
     nome = campo_nome.get()
@@ -150,15 +160,15 @@ def cadastrar_usuario():
     if senha != confirmar:
         resultado.configure(text="❌ As senhas não coincidem!", text_color="red")
     elif nome and email and senha:
-        sucesso = cadastrar_no_banco(nome, email, senha)
+        sucesso, mensagem = cadastrar_no_banco(nome, email, senha)
         if sucesso:
-            resultado.configure(text="✅ Cadastro realizado com sucesso!", text_color="green")
+            resultado.configure(text=f"✅ {mensagem}", text_color="green")
             campo_nome.delete(0, "end")
             campo_email.delete(0, "end")
             campo_senha.delete(0, "end")
             campo_confirmar_senha.delete(0, "end")
         else:
-            resultado.configure(text="❌ Erro ao cadastrar no banco!", text_color="red")
+            resultado.configure(text=f"❌ {mensagem}", text_color="red")
     else:
         resultado.configure(text="⚠️ Preencha todos os campos.", text_color="yellow")
 
