@@ -1,32 +1,57 @@
 import customtkinter as ctk
+from PIL import Image
+import os
+from dotenv import load_dotenv
+
+load_dotenv('credenciais.env')
 
 class TelaHomeAdmin:
-    def __init__(self):
-        self.janela = ctk.CTk()
-        self.janela.title("Home Administrador")
-        self.janela.geometry("800x500")
-        ctk.set_appearance_mode("dark")
+    def __init__(self, master):
+        self.master = master
+        self.master.title("📚 Biblioteca - Painel Admin")
+        self.master.geometry("800x600")
         
-        self.frame_principal = ctk.CTkFrame(self.janela, corner_radius=0, fg_color="#1e1e1e")
-        self.frame_principal.pack(fill="both", expand=True, padx=20, pady=20)
-
+        # Remove todos os widgets existentes
+        for widget in self.master.winfo_children():
+            widget.destroy()
+        
+        # Configurações de tema
+        ctk.set_appearance_mode("dark")
+        ctk.set_default_color_theme("blue")
+        
+        # Frame principal
+        self.frame_principal = ctk.CTkFrame(self.master, corner_radius=15)
+        self.frame_principal.pack(fill="both", expand=True, padx=40, pady=40)
+        
         self.carregar_interface()
 
-        self.janela.mainloop()
-
     def carregar_interface(self):
+        """Carrega a interface principal do admin"""
         for widget in self.frame_principal.winfo_children():
             widget.destroy()
 
-        ctk.CTkLabel(
-            self.frame_principal, text="Painel do Administrador",
-            font=ctk.CTkFont(size=24, weight="bold")
-        ).pack(pady=(10, 30))
+        # Cabeçalho
+        try:
+            imagem = ctk.CTkImage(Image.open(os.getenv("LOGO_UNI")), size=(80, 80))
+            logo = ctk.CTkLabel(master=self.frame_principal, image=imagem, text="")
+            logo.pack(pady=(10, 5))
+        except Exception as e:
+            print(f"Erro ao carregar imagem: {e}")
+            logo = ctk.CTkLabel(master=self.frame_principal, text="👑", font=("Arial", 30))
+            logo.pack(pady=(10, 5))
 
+        ctk.CTkLabel(
+            self.frame_principal, 
+            text="Painel do Administrador",
+            font=ctk.CTkFont(size=24, weight="bold")
+        ).pack(pady=(5, 20))
+
+        # Botões principais
         botoes = [
-            ("📚 Cadastrar Livro", self.cadastrar_livro),
-            ("🏆 Cadastrar Conquista", self.cadastrar_conquista),
-            ("👥 Ver Usuários da Biblioteca", self.ver_usuarios),
+            ("📚 Gerenciar Livros", self.gerenciar_livros),
+            ("👥 Gerenciar Usuários", self.gerenciar_usuarios),
+            ("📊 Relatórios", self.mostrar_relatorios),
+            ("⚙️ Configurações", self.mostrar_configuracoes),
             ("🚪 Sair", self.sair)
         ]
 
@@ -38,43 +63,61 @@ class TelaHomeAdmin:
                 font=ctk.CTkFont(size=16),
                 height=50,
                 width=250,
-                corner_radius=10
+                corner_radius=10,
+                fg_color="#2b2b2b",
+                hover_color="#3a3a3a"
             )
             btn.pack(pady=10)
 
-    def mostrar_tela_simples(self, titulo, descricao):
+    def mostrar_tela_secundaria(self, titulo, conteudo=None):
+        """Mostra uma tela secundária com opção de voltar"""
         for widget in self.frame_principal.winfo_children():
             widget.destroy()
 
-        ctk.CTkLabel(
-            self.frame_principal, text=titulo,
-            font=ctk.CTkFont(size=22, weight="bold")
-        ).pack(pady=20)
-
-        ctk.CTkLabel(
-            self.frame_principal, text=descricao,
-            font=ctk.CTkFont(size=14), text_color="#aaaaaa"
-        ).pack(pady=10)
-
-        voltar_btn = ctk.CTkButton(
-            self.frame_principal, text="🔙 Voltar",
+        # Botão voltar
+        btn_voltar = ctk.CTkButton(
+            self.frame_principal,
+            text="🔙 Voltar",
             command=self.carregar_interface,
             font=ctk.CTkFont(size=14),
-            corner_radius=10
+            width=100,
+            corner_radius=10,
+            fg_color="transparent",
+            hover_color="#2b2b2b"
         )
-        voltar_btn.pack(pady=20)
+        btn_voltar.pack(pady=(10, 20), anchor="w", padx=20)
 
-    def cadastrar_livro(self):
-        self.mostrar_tela_simples("Cadastrar Livro", "Aqui você pode cadastrar novos livros.")
+        # Título
+        ctk.CTkLabel(
+            self.frame_principal,
+            text=titulo,
+            font=ctk.CTkFont(size=22, weight="bold")
+        ).pack(pady=(0, 20))
 
-    def cadastrar_conquista(self):
-        self.mostrar_tela_simples("Cadastrar Conquista", "Aqui você pode cadastrar novas conquistas para gamificação.")
+        # Conteúdo personalizado se fornecido
+        if conteudo:
+            conteudo(self.frame_principal)
 
-    def ver_usuarios(self):
-        self.mostrar_tela_simples("Usuários da Biblioteca", "Aqui você pode visualizar e gerenciar os usuários.")
+    def gerenciar_livros(self):
+        self.mostrar_tela_secundaria("📚 Gerenciamento de Livros")
+
+    def gerenciar_usuarios(self):
+        self.mostrar_tela_secundaria("👥 Gerenciamento de Usuários")
+
+    def mostrar_relatorios(self):
+        self.mostrar_tela_secundaria("📊 Relatórios")
+
+    def mostrar_configuracoes(self):
+        self.mostrar_tela_secundaria("⚙️ Configurações")
 
     def sair(self):
-        self.janela.destroy()
+        self.master.destroy()  # Fecha completamente a aplicação
+        # Alternativa: Voltar para tela de login
+        # from app import mostrar_tela_login
+        # mostrar_tela_login(self.master)
 
 if __name__ == "__main__":
-    TelaHomeAdmin()
+    # Para testes isolados
+    janela = ctk.CTk()
+    TelaHomeAdmin(janela)
+    janela.mainloop()
