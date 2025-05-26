@@ -2,6 +2,12 @@ import customtkinter as ctk
 from PIL import Image
 import os
 from dotenv import load_dotenv
+from tela_biblioteca import TelaBiblioteca
+from tela_de_conquistas import TelaConquistas
+from tela_perfil import TelaPerfil
+from tela_registro_leituras import TelaRegistroLeituras
+
+
 
 load_dotenv('credenciais.env')
 
@@ -11,23 +17,23 @@ class TelaHome:
         self.carregar_interface()
 
     def carregar_interface(self):
-        """Carrega toda a interface do zero"""
-        # Limpa a janela principal completamente
+        """carrega toda a interface do zero"""
+        # limpa a jnela principal completamente
         for widget in self.janela_principal.winfo_children():
             widget.destroy()
 
-        # Configurações da janela
+        # configurações da janela
         self.janela_principal.title("Biblioteca Digital")
         self.janela_principal.geometry("1100x650")
         
-        # Configuração do tema
+        # configuração do tema
         ctk.set_appearance_mode("dark")
         
-        # Frame principal
+        # frame principal
         self.frame_principal = ctk.CTkFrame(self.janela_principal, corner_radius=0, fg_color="#1e1e1e")
         self.frame_principal.pack(fill="both", expand=True)
 
-        # Frame do menu lateral
+        # frame do menu lateral
         self.frame_menu = ctk.CTkFrame(
             self.frame_principal, 
             width=250, 
@@ -36,20 +42,20 @@ class TelaHome:
         )
         self.frame_menu.pack(side="left", fill="y")
 
-        # Frame do conteúdo principal (será recriado quando necessário)
+        # frame do conteúdo principal (será recriado quando necessário)
         self.frame_conteudo = None
         self.container_conteudo = None
         self.banner_frame = None
 
-        # Configura o menu lateral
+        # configura o menu lateral
         self.configurar_menu_lateral()
 
-        # Carrega a tela inicial
+        # carrega a tela inicial
         self.mostrar_home()
 
     def configurar_menu_lateral(self):
-        """Configura o menu lateral uma única vez"""
-        # Cabeçalho do menu com logo
+        """configura o menu lateral uma única vez"""
+        # cabeçalho do menu com logo
         cabecalho_menu = ctk.CTkFrame(self.frame_menu, fg_color="transparent")
         cabecalho_menu.pack(pady=(20, 30), padx=10, fill="x")
         
@@ -72,7 +78,7 @@ class TelaHome:
             )
             self.logo_label.pack(side="left", padx=(0, 10))
         
-        # Configura o clique na logo para recarregar toda a interface
+        # configura o clique na logo para recarregar toda a interface
         self.logo_label.bind("<Button-1>", lambda e: self.recarregar_tela_completa())
 
         ctk.CTkLabel(
@@ -82,7 +88,7 @@ class TelaHome:
             anchor="w"
         ).pack(side="left", fill="x", expand=True)
 
-        # Itens do menu
+        # itens do menu
         opcoes_menu = [
             ("📖 Leituras", self.mostrar_leitura),
             ("📚 Biblioteca", self.mostrar_biblioteca),
@@ -276,12 +282,12 @@ class TelaHome:
         return card
 
     def mostrar_tela_generica(self, titulo, conteudo):
-        """Método genérico para mostrar conteúdo de uma tela"""
-        # Destroi o frame de conteúdo se existir
+        """metdo genérico para mostrar conteúdo de uma tela"""
+        # destroi o frame de conteúdo se existir
         if self.frame_conteudo:
             self.frame_conteudo.destroy()
         
-        # Cria novo frame de conteúdo
+        # cria novo frame de conteúdo
         self.frame_conteudo = ctk.CTkFrame(
             self.frame_principal, 
             corner_radius=0,
@@ -320,16 +326,57 @@ class TelaHome:
         ).pack(pady=50)
 
     def mostrar_leitura(self):
-        self.mostrar_tela_generica("📖 Leituras", "Conteúdo da tela de Leituras")
+        if self.frame_conteudo:
+            self.frame_conteudo.destroy()
+        
+        self.frame_conteudo = ctk.CTkFrame(
+            self.frame_principal, 
+            corner_radius=0,
+            fg_color="#1e1e1e"
+        )
+        self.frame_conteudo.pack(side="right", expand=True, fill="both")
+        
+        TelaRegistroLeituras(self.frame_conteudo)
 
     def mostrar_biblioteca(self):
-        self.mostrar_tela_generica("📚 Biblioteca", "Conteúdo da tela de Biblioteca")
+        if self.frame_conteudo:
+            self.frame_conteudo.destroy()
+        
+        self.frame_conteudo = ctk.CTkFrame(
+            self.frame_principal, 
+            corner_radius=0,
+            fg_color="#1e1e1e"
+        )
+        self.frame_conteudo.pack(side="right", expand=True, fill="both")
+        
+        TelaBiblioteca(self.frame_conteudo)
 
     def mostrar_conquistas(self):
-        self.mostrar_tela_generica("🏆 Conquistas", "Conteúdo da tela de Conquistas")
+        """Mostra a tela de conquistas"""
+        if self.frame_conteudo:
+            self.frame_conteudo.destroy()
+        
+        self.frame_conteudo = ctk.CTkFrame(
+            self.frame_principal, 
+            corner_radius=0,
+            fg_color="#1e1e1e"
+        )
+        self.frame_conteudo.pack(side="right", expand=True, fill="both")
+        TelaConquistas(self.frame_conteudo)
 
     def mostrar_perfil(self):
-        self.mostrar_tela_generica("👤 Perfil", "Conteúdo da tela de Perfil")
+        if self.frame_conteudo:
+            self.frame_conteudo.destroy()
+        
+        self.frame_conteudo = ctk.CTkFrame(
+            self.frame_principal, 
+            corner_radius=0,
+            fg_color="#1e1e1e"
+        )
+        self.frame_conteudo.pack(side="right", expand=True, fill="both")
+        
+        TelaPerfil(self.frame_conteudo)
+
 
     def sair(self):
         for widget in self.janela_principal.winfo_children():
@@ -339,3 +386,9 @@ class TelaHome:
 
 def mostrar_tela_home(janela_principal):
     TelaHome(janela_principal)
+
+if __name__ == "__main__":
+    import tkinter as tk
+    root = ctk.CTk()  # ou tk.Tk() se estiver usando tkinter puro
+    mostrar_tela_home(root)
+    root.mainloop()
