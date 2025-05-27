@@ -1,9 +1,13 @@
 import customtkinter as ctk
 from PIL import Image
 import os
+import sys
 from dotenv import load_dotenv
+from frontend.tela_de_conquistas_adm import TelaConquistas
 
-load_dotenv('credenciais.env')
+# Define o caminho absoluto para o .env na pasta backend
+caminho_env = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend', 'credenciais.env'))
+load_dotenv(dotenv_path=caminho_env)
 
 class TelaHomeAdmin:
     def __init__(self, master):
@@ -11,28 +15,30 @@ class TelaHomeAdmin:
         self.master.title("📚 Biblioteca - Painel Admin")
         self.master.geometry("800x600")
         
-        # Remove todos os widgets existentes
         for widget in self.master.winfo_children():
             widget.destroy()
         
-        # Configurações de tema
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
         
-        # Frame principal
         self.frame_principal = ctk.CTkFrame(self.master, corner_radius=15)
         self.frame_principal.pack(fill="both", expand=True, padx=40, pady=40)
         
         self.carregar_interface()
 
     def carregar_interface(self):
-        """Carrega a interface principal do admin"""
         for widget in self.frame_principal.winfo_children():
             widget.destroy()
 
-        # Cabeçalho
         try:
-            imagem = ctk.CTkImage(Image.open(os.getenv("LOGO_UNI")), size=(80, 80))
+            logo_path = os.getenv("LOGO_UNI")
+            if not logo_path:
+                raise ValueError("Variável LOGO_UNI não encontrada no .env")
+
+            # Ajuste se o caminho for relativo: converte para absoluto
+            logo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend', logo_path))
+
+            imagem = ctk.CTkImage(Image.open(logo_path), size=(80, 80))
             logo = ctk.CTkLabel(master=self.frame_principal, image=imagem, text="")
             logo.pack(pady=(10, 5))
         except Exception as e:
@@ -46,11 +52,10 @@ class TelaHomeAdmin:
             font=ctk.CTkFont(size=24, weight="bold")
         ).pack(pady=(5, 20))
 
-        # Botões principais
         botoes = [
             ("📚 Gerenciar Livros", self.gerenciar_livros),
             ("👥 Gerenciar Usuários", self.gerenciar_usuarios),
-            ("📊 Relatórios", self.mostrar_relatorios),
+            ("🏆 Conquistas", self.gerenciar_conquistas),
             ("⚙️ Configurações", self.mostrar_configuracoes),
             ("🚪 Sair", self.sair)
         ]
@@ -70,11 +75,9 @@ class TelaHomeAdmin:
             btn.pack(pady=10)
 
     def mostrar_tela_secundaria(self, titulo, conteudo=None):
-        """Mostra uma tela secundária com opção de voltar"""
         for widget in self.frame_principal.winfo_children():
             widget.destroy()
 
-        # Botão voltar
         btn_voltar = ctk.CTkButton(
             self.frame_principal,
             text="🔙 Voltar",
@@ -87,16 +90,14 @@ class TelaHomeAdmin:
         )
         btn_voltar.pack(pady=(10, 20), anchor="w", padx=20)
 
-        # Título
         ctk.CTkLabel(
             self.frame_principal,
             text=titulo,
             font=ctk.CTkFont(size=22, weight="bold")
         ).pack(pady=(0, 20))
 
-        # Conteúdo personalizado se fornecido
         if conteudo:
-            conteudo(self.frame_principal)
+            conteudo(self.frame_principal, self.carregar_interface)
 
     def gerenciar_livros(self):
         self.mostrar_tela_secundaria("📚 Gerenciamento de Livros")
@@ -104,20 +105,16 @@ class TelaHomeAdmin:
     def gerenciar_usuarios(self):
         self.mostrar_tela_secundaria("👥 Gerenciamento de Usuários")
 
-    def mostrar_relatorios(self):
-        self.mostrar_tela_secundaria("📊 Relatórios")
+    def gerenciar_conquistas(self):
+        self.mostrar_tela_secundaria("🏆 Conquistas", TelaConquistas)
 
     def mostrar_configuracoes(self):
         self.mostrar_tela_secundaria("⚙️ Configurações")
 
     def sair(self):
-        self.master.destroy()  # Fecha completamente a aplicação
-        # Alternativa: Voltar para tela de login
-        # from app import mostrar_tela_login
-        # mostrar_tela_login(self.master)
+        self.master.destroy()
 
 if __name__ == "__main__":
-    # Para testes isolados
     janela = ctk.CTk()
     TelaHomeAdmin(janela)
     janela.mainloop()
