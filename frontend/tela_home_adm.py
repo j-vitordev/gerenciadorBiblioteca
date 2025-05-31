@@ -4,12 +4,19 @@ import os
 import sys
 from dotenv import load_dotenv
 from frontend.tela_de_conquistas_adm import TelaConquistas
+from frontend.cadastroLivroFront import TelaCadastroLivro  
+
+
 
 # Define o caminho absoluto para o .env na pasta backend
 caminho_env = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend', 'credenciais.env'))
 load_dotenv(dotenv_path=caminho_env)
 
 class TelaHomeAdmin:
+    def gerenciar_livros(self):
+        self.mostrar_tela_secundaria("📚 Cadastro de Livro", TelaCadastroLivro)
+
+
     def __init__(self, master):
         self.master = master
         self.master.title("📚 Biblioteca - Painel Admin")
@@ -100,7 +107,8 @@ class TelaHomeAdmin:
             conteudo(self.frame_principal, self.carregar_interface)
 
     def gerenciar_livros(self):
-        self.mostrar_tela_secundaria("📚 Gerenciamento de Livros")
+        from frontend.interface_gerenciamento_livros import interface_gerenciamento_livros
+        self.mostrar_tela_secundaria("📚 Gerenciamento de Livros", conteudo=interface_gerenciamento_livros)
 
     def gerenciar_usuarios(self):
         self.mostrar_tela_secundaria("👥 Gerenciamento de Usuários")

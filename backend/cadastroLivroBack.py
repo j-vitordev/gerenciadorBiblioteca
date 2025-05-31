@@ -1,6 +1,7 @@
 # backend/cadastroLivroBack.py
 
-from conexao import conectar
+from backend.conexao import conectar
+
 
 def cadastrar_livro(titulo, autor, editora, ano_publicacao, isbn, caminho_pdf):
     try:
