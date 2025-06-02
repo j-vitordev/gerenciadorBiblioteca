@@ -15,13 +15,6 @@ def TelaCadastroLivro(parent, callback_voltar):
             caminho_pdf_completo["caminho"] = caminho
             nome_arquivo = os.path.basename(caminho)
             label_pdf.configure(text=nome_arquivo)
-        # Botões
-        botao_cadastrar = ctk.CTkButton(parent, text="Cadastrar Livro", command=cadastrar_livro)
-        botao_cadastrar.pack(pady=15)
-
-        resultado = ctk.CTkLabel(parent, text="", font=("Arial", 12, "italic"))
-        resultado.pack(pady=5)
-
 
     def cadastrar_livro():
         titulo = campo_titulo.get()
@@ -68,9 +61,10 @@ def TelaCadastroLivro(parent, callback_voltar):
     botao_selecionar_pdf = ctk.CTkButton(parent, text="Selecionar PDF", command=selecionar_pdf)
     botao_selecionar_pdf.pack(pady=5)
 
-    # Botões
+    # Botão cadastrar
     botao_cadastrar = ctk.CTkButton(parent, text="Cadastrar Livro", command=cadastrar_livro)
     botao_cadastrar.pack(pady=15)
 
+    # Resultado
     resultado = ctk.CTkLabel(parent, text="", font=("Arial", 12, "italic"))
     resultado.pack(pady=5)
