@@ -4,9 +4,8 @@ import os
 import sys
 from dotenv import load_dotenv
 from frontend.tela_de_conquistas_adm import TelaConquistas
-from frontend.cadastroLivroFront import TelaCadastroLivro  
-
-
+from frontend.cadastroLivroFront import TelaCadastroLivro
+from frontend.gerenciar_usuarios_front import TelaGerenciarUsuarios
 
 # Define o caminho absoluto para o .env na pasta backend
 caminho_env = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend', 'credenciais.env'))
@@ -15,7 +14,6 @@ load_dotenv(dotenv_path=caminho_env)
 class TelaHomeAdmin:
     def gerenciar_livros(self):
         self.mostrar_tela_secundaria("📚 Cadastro de Livro", TelaCadastroLivro)
-
 
     def __init__(self, master):
         self.master = master
@@ -63,7 +61,6 @@ class TelaHomeAdmin:
             ("📚 Gerenciar Livros", self.gerenciar_livros),
             ("👥 Gerenciar Usuários", self.gerenciar_usuarios),
             ("🏆 Conquistas", self.gerenciar_conquistas),
-            ("⚙️ Configurações", self.mostrar_configuracoes),
             ("🚪 Sair", self.sair)
         ]
 
@@ -111,13 +108,10 @@ class TelaHomeAdmin:
         self.mostrar_tela_secundaria("📚 Gerenciamento de Livros", conteudo=interface_gerenciamento_livros)
 
     def gerenciar_usuarios(self):
-        self.mostrar_tela_secundaria("👥 Gerenciamento de Usuários")
+        self.mostrar_tela_secundaria("👥 Gerenciamento de Usuários", TelaGerenciarUsuarios)
 
     def gerenciar_conquistas(self):
         self.mostrar_tela_secundaria("🏆 Conquistas", TelaConquistas)
-
-    def mostrar_configuracoes(self):
-        self.mostrar_tela_secundaria("⚙️ Configurações")
 
     def sair(self):
         self.master.destroy()
