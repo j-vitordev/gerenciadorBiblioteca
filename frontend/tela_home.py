@@ -5,9 +5,6 @@ from dotenv import load_dotenv
 from tela_biblioteca import TelaBiblioteca
 from tela_de_conquistas import TelaConquistas
 from tela_perfil import TelaPerfil
-from tela_registro_leituras import TelaRegistroLeituras
-
-
 
 load_dotenv('credenciais.env')
 
@@ -18,7 +15,7 @@ class TelaHome:
 
     def carregar_interface(self):
         """carrega toda a interface do zero"""
-        # limpa a jnela principal completamente
+        # limpa a janela principal completamente
         for widget in self.janela_principal.winfo_children():
             widget.destroy()
 
@@ -88,9 +85,8 @@ class TelaHome:
             anchor="w"
         ).pack(side="left", fill="x", expand=True)
 
-        # itens do menu
+        # itens do menu (sem a opção "Leituras")
         opcoes_menu = [
-            ("📖 Leituras", self.mostrar_leitura),
             ("📚 Biblioteca", self.mostrar_biblioteca),
             ("🏆 Conquistas", self.mostrar_conquistas),
             ("👤 Perfil", self.mostrar_perfil),
@@ -282,7 +278,7 @@ class TelaHome:
         return card
 
     def mostrar_tela_generica(self, titulo, conteudo):
-        """metdo genérico para mostrar conteúdo de uma tela"""
+        """método genérico para mostrar conteúdo de uma tela"""
         # destroi o frame de conteúdo se existir
         if self.frame_conteudo:
             self.frame_conteudo.destroy()
@@ -325,19 +321,6 @@ class TelaHome:
             font=ctk.CTkFont(size=16)
         ).pack(pady=50)
 
-    def mostrar_leitura(self):
-        if self.frame_conteudo:
-            self.frame_conteudo.destroy()
-        
-        self.frame_conteudo = ctk.CTkFrame(
-            self.frame_principal, 
-            corner_radius=0,
-            fg_color="#1e1e1e"
-        )
-        self.frame_conteudo.pack(side="right", expand=True, fill="both")
-        
-        TelaRegistroLeituras(self.frame_conteudo)
-
     def mostrar_biblioteca(self):
         if self.frame_conteudo:
             self.frame_conteudo.destroy()
@@ -376,7 +359,6 @@ class TelaHome:
         self.frame_conteudo.pack(side="right", expand=True, fill="both")
         
         TelaPerfil(self.frame_conteudo)
-
 
     def sair(self):
         for widget in self.janela_principal.winfo_children():
