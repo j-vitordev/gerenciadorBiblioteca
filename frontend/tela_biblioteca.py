@@ -69,29 +69,6 @@ class TelaBiblioteca:
         self.busca_entry.pack(side="right")
         self.busca_entry.bind("<KeyRelease>", self.filtrar_livros)
 
-        # Filtros
-        filtros_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
-        filtros_frame.pack(fill="x", pady=5)
-
-        ctk.CTkLabel(
-            filtros_frame,
-            text="Filtrar por:",
-            font=ctk.CTkFont(size=14)
-        ).pack(side="left", padx=(0, 10))
-
-        self.filtros = ["Todos", "Lidos", "Lendo", "Quero ler"]
-        self.filtro_selecionado = ctk.StringVar(value="Todos")
-        
-        for filtro in self.filtros:
-            btn = ctk.CTkRadioButton(
-                filtros_frame,
-                text=filtro,
-                variable=self.filtro_selecionado,
-                value=filtro,
-                command=self.filtrar_livros
-            )
-            btn.pack(side="left", padx=5)
-
         # Container para os livros
         self.livros_container = ctk.CTkFrame(main_frame, fg_color="transparent")
         self.livros_container.pack(fill="both", expand=True)
@@ -132,7 +109,7 @@ class TelaBiblioteca:
         card = ctk.CTkFrame(
             frame,
             width=200,
-            height=180,
+            height=200,
             corner_radius=10,
             fg_color="#252525",
             border_width=1,
@@ -173,14 +150,43 @@ class TelaBiblioteca:
             anchor="w"
         ).pack(fill="x", padx=10)
 
+        # Frame para os botões
+        botoes_frame = ctk.CTkFrame(card, fg_color="transparent")
+        botoes_frame.pack(fill="x", pady=5, padx=5)
+
         # Botão para abrir o livro
         btn_abrir = ctk.CTkButton(
-            card,
+            botoes_frame,
             text="Abrir Livro",
             width=100,
             command=lambda l=livro: self.abrir_livro(l)
         )
-        btn_abrir.pack(pady=5)
+        btn_abrir.pack(side="left", padx=5)
+
+        # Botão marcador (bookmark)
+        btn_marcador = ctk.CTkButton(
+            botoes_frame,
+            text="🔖",
+            width=30,
+            fg_color="transparent",
+            hover_color="#333333"
+        )
+        
+        # Configuração do comando com uma função lambda que passa tanto o livro quanto o botão
+        btn_marcador.configure(
+            command=lambda l=livro, btn=btn_marcador: self.marcar_livro(l, btn)
+        )
+        btn_marcador.pack(side="right", padx=5)
+
+    def marcar_livro(self, livro, botao_marcador):
+        """Função para marcar/desmarcar um livro como lido"""
+        print(f"Livro marcado: {livro['titulo']}")
+        
+        # Alterna entre os estados marcado/desmarcado
+        if botao_marcador.cget("text") == "🔖":
+            botao_marcador.configure(text="✅", fg_color="#2e8b57")  # Marcado
+        else:
+            botao_marcador.configure(text="🔖", fg_color="transparent")  # Desmarcado
 
     def abrir_livro(self, livro):
         """Abre o livro PDF no visualizador padrão do sistema"""
@@ -216,27 +222,19 @@ class TelaBiblioteca:
                              icon="cancel")
 
     def filtrar_livros(self, event=None):
-        """Filtra os livros com base na busca e no filtro selecionado"""
+        """Filtra os livros apenas com base na busca (sem filtros de status)"""
         termo_busca = self.busca_entry.get().lower()
-        filtro = self.filtro_selecionado.get()
+        
+        if not termo_busca:
+            self.mostrar_livros(self.livros)
+            return
 
         livros_filtrados = []
         
         for livro in self.livros:
             # Filtro por termo de busca
-            busca_match = (termo_busca in livro["titulo"].lower() or 
-                          termo_busca in livro["autor"].lower())
-            
-            # Filtro por status (implementação básica - você pode adaptar)
-            status_match = True
-            if filtro == "Lidos":
-                status_match = False  # Você precisará adicionar um campo 'lido' no seu banco
-            elif filtro == "Lendo":
-                status_match = False  # Você precisará adicionar um campo 'lendo' no seu banco
-            elif filtro == "Quero ler":
-                status_match = False  # Você precisará adicionar um campo 'quero_ler' no seu banco
-            
-            if busca_match and status_match:
+            if (termo_busca in livro["titulo"].lower() or 
+                termo_busca in livro["autor"].lower()):
                 livros_filtrados.append(livro)
         
         self.mostrar_livros(livros_filtrados)
