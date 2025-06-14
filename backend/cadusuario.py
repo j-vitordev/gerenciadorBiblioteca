@@ -2,6 +2,10 @@ from .conexao import conectar
 import bcrypt
 
 def cadastrar_usuario(nome, email, senha):
+    """
+    Cadastra um novo usuário no sistema
+    Retorna: (sucesso: bool, mensagem: str)
+    """
     try:
         conn = conectar()
         cursor = conn.cursor()
@@ -17,34 +21,72 @@ def cadastrar_usuario(nome, email, senha):
         # Criptografa a senha
         senha_hash = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
 
+        # Insere o novo usuário
         cursor.execute(
             "INSERT INTO Usuarios (nome, email, senha, is_admin) VALUES (?, ?, ?, ?)",
             (nome, email, senha_hash.decode('utf-8'), is_admin)
         )
 
         conn.commit()
-        conn.close()
         return True, "Usuário admin cadastrado com sucesso!" if is_admin else "Usuário cadastrado com sucesso!"
+    
     except Exception as e:
         print("Erro ao cadastrar:", e)
         return False, f"Erro ao cadastrar: {str(e)}"
+    
+    finally:
+        if 'conn' in locals():
+            conn.close()
 
 def validar_usuario(email, senha):
+    """
+    Valida as credenciais do usuário
+    Retorna: {
+        "sucesso": bool,
+        "admin": bool,
+        "usuario_id": int | None
+    }
+    """
     try:
         conn = conectar()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT senha, is_admin FROM Usuarios WHERE email = ?", (email,))
+        # Busca usuário incluindo o ID
+        cursor.execute("""
+            SELECT id, senha, is_admin 
+            FROM Usuarios 
+            WHERE email = ?
+        """, (email,))
+        
         resultado = cursor.fetchone()
 
         if resultado:
-            senha_hash = resultado[0]
-            is_admin = bool(resultado[1])
+            usuario_id = resultado[0]
+            senha_hash = resultado[1]
+            is_admin = bool(resultado[2])
             
+            # Verifica a senha
             if bcrypt.checkpw(senha.encode('utf-8'), senha_hash.encode('utf-8')):
-                return {"sucesso": True, "admin": is_admin}
+                return {
+                    "sucesso": True,
+                    "admin": is_admin,
+                    "usuario_id": usuario_id  # ID do usuário autenticado
+                }
         
-        return {"sucesso": False, "admin": False}
+        return {
+            "sucesso": False,
+            "admin": False,
+            "usuario_id": None
+        }
+    
     except Exception as e:
         print("Erro ao validar login:", e)
-        return {"sucesso": False, "admin": False}
+        return {
+            "sucesso": False,
+            "admin": False,
+            "usuario_id": None
+        }
+    
+    finally:
+        if 'conn' in locals():
+            conn.close()

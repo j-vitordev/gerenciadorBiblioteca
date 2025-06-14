@@ -9,8 +9,16 @@ from tela_perfil import TelaPerfil
 load_dotenv('credenciais.env')
 
 class TelaHome:
-    def __init__(self, janela_principal):
+    def __init__(self, janela_principal, usuario_id):
+        """
+        Inicializa a tela principal
+        
+        Args:
+            janela_principal: A janela root da aplicação
+            usuario_id: ID do usuário logado (obtido no login)
+        """
         self.janela_principal = janela_principal
+        self.usuario_id = usuario_id  # Armazena o ID do usuário
         self.carregar_interface()
 
     def carregar_interface(self):
@@ -39,7 +47,7 @@ class TelaHome:
         )
         self.frame_menu.pack(side="left", fill="y")
 
-        # frame do conteúdo principal (será recriado quando necessário)
+        # frame do conteúdo principal
         self.frame_conteudo = None
         self.container_conteudo = None
         self.banner_frame = None
@@ -75,7 +83,7 @@ class TelaHome:
             )
             self.logo_label.pack(side="left", padx=(0, 10))
         
-        # configura o clique na logo para recarregar toda a interface
+        # configura o clique na logo
         self.logo_label.bind("<Button-1>", lambda e: self.recarregar_tela_completa())
 
         ctk.CTkLabel(
@@ -85,7 +93,7 @@ class TelaHome:
             anchor="w"
         ).pack(side="left", fill="x", expand=True)
 
-        # itens do menu (sem a opção "Leituras")
+        # itens do menu
         opcoes_menu = [
             ("📚 Biblioteca", self.mostrar_biblioteca),
             ("🏆 Conquistas", self.mostrar_conquistas),
@@ -126,11 +134,9 @@ class TelaHome:
 
     def mostrar_home(self):
         """Mostra a tela inicial"""
-        # Destroi o frame de conteúdo se existir
         if self.frame_conteudo:
             self.frame_conteudo.destroy()
         
-        # Cria novo frame de conteúdo
         self.frame_conteudo = ctk.CTkFrame(
             self.frame_principal, 
             corner_radius=0,
@@ -153,9 +159,10 @@ class TelaHome:
         )
         self.banner_frame.pack(fill="x", pady=(0, 20))
         
+        # Mensagem personalizada com o ID do usuário
         ctk.CTkLabel(
             self.banner_frame,
-            text="Bem-vindo à Biblioteca Digital",
+            text=f"Bem-vindo, usuário #{self.usuario_id}",
             font=ctk.CTkFont(size=22, weight="bold"),
             anchor="w",
             padx=20
@@ -227,7 +234,7 @@ class TelaHome:
             ).pack(side="right")
 
     def criar_card_interativo(self, frame, emoji, titulo, descricao, comando):
-        """Cria um card clicável estável"""
+        """Cria um card clicável"""
         card = ctk.CTkFrame(
             frame,
             width=200,
@@ -277,51 +284,8 @@ class TelaHome:
         
         return card
 
-    def mostrar_tela_generica(self, titulo, conteudo):
-        """método genérico para mostrar conteúdo de uma tela"""
-        # destroi o frame de conteúdo se existir
-        if self.frame_conteudo:
-            self.frame_conteudo.destroy()
-        
-        # cria novo frame de conteúdo
-        self.frame_conteudo = ctk.CTkFrame(
-            self.frame_principal, 
-            corner_radius=0,
-            fg_color="#1e1e1e"
-        )
-        self.frame_conteudo.pack(side="right", expand=True, fill="both")
-
-        # Container principal com scroll
-        self.container_conteudo = ctk.CTkScrollableFrame(self.frame_conteudo, fg_color="transparent")
-        self.container_conteudo.pack(fill="both", expand=True, padx=20, pady=20)
-
-        # Banner superior
-        self.banner_frame = ctk.CTkFrame(
-            self.container_conteudo, 
-            height=150, 
-            fg_color="#2a2a2a",
-            border_width=1,
-            border_color="#333333",
-            corner_radius=10
-        )
-        self.banner_frame.pack(fill="x", pady=(0, 20))
-        
-        ctk.CTkLabel(
-            self.banner_frame,
-            text=titulo,
-            font=ctk.CTkFont(size=22, weight="bold"),
-            anchor="w",
-            padx=20
-        ).pack(side="left", fill="y")
-        
-        # Adiciona o conteúdo específico
-        ctk.CTkLabel(
-            self.container_conteudo,
-            text=conteudo,
-            font=ctk.CTkFont(size=16)
-        ).pack(pady=50)
-
     def mostrar_biblioteca(self):
+        """Mostra a tela da biblioteca"""
         if self.frame_conteudo:
             self.frame_conteudo.destroy()
         
@@ -332,7 +296,8 @@ class TelaHome:
         )
         self.frame_conteudo.pack(side="right", expand=True, fill="both")
         
-        TelaBiblioteca(self.frame_conteudo)
+        # Passa o usuario_id para a TelaBiblioteca
+        TelaBiblioteca(self.frame_conteudo, self.usuario_id)
 
     def mostrar_conquistas(self):
         """Mostra a tela de conquistas"""
@@ -345,9 +310,12 @@ class TelaHome:
             fg_color="#1e1e1e"
         )
         self.frame_conteudo.pack(side="right", expand=True, fill="both")
-        TelaConquistas(self.frame_conteudo)
+        
+        # Passa o usuario_id para a TelaConquistas
+        TelaConquistas(self.frame_conteudo, self.usuario_id)
 
     def mostrar_perfil(self):
+        """Mostra a tela de perfil"""
         if self.frame_conteudo:
             self.frame_conteudo.destroy()
         
@@ -358,19 +326,28 @@ class TelaHome:
         )
         self.frame_conteudo.pack(side="right", expand=True, fill="both")
         
-        TelaPerfil(self.frame_conteudo)
+        # Passa o usuario_id para a TelaPerfil
+        TelaPerfil(self.frame_conteudo, self.usuario_id)
 
     def sair(self):
+        """Volta para a tela de login"""
         for widget in self.janela_principal.winfo_children():
             widget.destroy()
         from app import mostrar_tela_login
         mostrar_tela_login(self.janela_principal)
 
-def mostrar_tela_home(janela_principal):
-    TelaHome(janela_principal)
+def mostrar_tela_home(janela_principal, usuario_id):
+    """
+    Função de inicialização da tela home
+    
+    Args:
+        janela_principal: Janela root da aplicação
+        usuario_id: ID do usuário logado
+    """
+    TelaHome(janela_principal, usuario_id)
 
 if __name__ == "__main__":
-    import tkinter as tk
-    root = ctk.CTk()  # ou tk.Tk() se estiver usando tkinter puro
-    mostrar_tela_home(root)
-    root.mainloop()
+    # Para testes locais
+    janela_teste = ctk.CTk()
+    mostrar_tela_home(janela_teste, usuario_id=1)  # ID de teste
+    janela_teste.mainloop()
