@@ -1,5 +1,9 @@
 import customtkinter as ctk
-from backend.cadusuario import buscar_dados_usuario  # ajuste se o nome da função for diferente
+from tkinter import messagebox
+from customtkinter import CTkInputDialog
+
+from backend.cadusuario import buscar_dados_usuario, atualizar_senha  # Importa as funções necessárias
+
 
 class TelaPerfil:
     def __init__(self, container, usuario_id):
@@ -51,5 +55,24 @@ class TelaPerfil:
         ).pack(pady=20)
 
     def redefinir_senha(self):
-        # Lógica para redefinição de senha
-        print("Abrir tela para redefinição de senha")
+        nova_senha = CTkInputDialog(title="Nova Senha", text="Digite a nova senha:").get_input()
+        if not nova_senha:
+            return  # usuário cancelou
+
+        confirmar = CTkInputDialog(title="Confirmar Senha", text="Confirme a nova senha:").get_input()
+        if not confirmar:
+            return
+
+        if nova_senha != confirmar:
+            messagebox.showerror("Erro", "As senhas não coincidem.")
+            return
+
+        if len(nova_senha) < 6:
+            messagebox.showwarning("Senha fraca", "A senha deve ter pelo menos 6 caracteres.")
+            return
+
+        sucesso, mensagem = atualizar_senha(self.usuario_id, nova_senha)
+        if sucesso:
+            messagebox.showinfo("Sucesso", mensagem)
+        else:
+            messagebox.showerror("Erro", mensagem)
