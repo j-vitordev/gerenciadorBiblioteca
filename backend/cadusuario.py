@@ -90,3 +90,64 @@ def validar_usuario(email, senha):
     finally:
         if 'conn' in locals():
             conn.close()
+
+
+
+def buscar_dados_usuario(usuario_id):
+    """
+    Retorna os dados do usuário (nome e categoria) dado o ID
+    """
+    try:
+        conn = conectar()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT nome, is_admin FROM Usuarios WHERE id = ?", (usuario_id,))
+        resultado = cursor.fetchone()
+
+        if resultado:
+            nome = resultado[0]
+            is_admin = resultado[1]
+            categoria = "Administrador" if is_admin else "Leitor"
+            return {
+                "nome": nome,
+                "categoria": categoria
+            }
+        else:
+            return {
+                "nome": "Desconhecido",
+                "categoria": "Indefinido"
+            }
+
+    except Exception as e:
+        print("Erro ao buscar dados do usuário:", e)
+        return {
+            "nome": "Erro",
+            "categoria": "Erro"
+        }
+    
+    finally:
+        if 'conn' in locals():
+            conn.close()
+
+
+def atualizar_senha(usuario_id, nova_senha):
+    """
+    Atualiza a senha de um usuário específico.
+    """
+    try:
+        conn = conectar()
+        cursor = conn.cursor()
+
+        senha_hash = bcrypt.hashpw(nova_senha.encode('utf-8'), bcrypt.gensalt())
+
+        cursor.execute("UPDATE Usuarios SET senha = ? WHERE id = ?", (senha_hash.decode('utf-8'), usuario_id))
+        conn.commit()
+        return True, "Senha atualizada com sucesso!"
+    
+    except Exception as e:
+        print("Erro ao atualizar senha:", e)
+        return False, f"Erro ao atualizar senha: {str(e)}"
+    
+    finally:
+        if 'conn' in locals():
+            conn.close()
